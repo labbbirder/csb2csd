@@ -12,8 +12,7 @@ import sys
 
 ENGINE_VERSION = "3.10.0.0"
 
-script_path = os.path.split(os.path.realpath(sys.argv[0]))[0]
-targetOut = os.path.join(script_path, "csd")
+script_path = os.path.dirname(__file__)
 
 with open(os.path.join(script_path, "header_rule.json"), "r") as fileObj:
 	HeaderRules = json.load(fileObj)
@@ -23,12 +22,13 @@ with open(os.path.join(script_path, "child_rule.json"), "r") as fileObj:
 	ChildRules = json.load(fileObj)
 	fileObj.close()
 
-if not os.path.exists(targetOut):
-	os.mkdir(targetOut)
 
 csdPath = ""
-
-
+_onRef = None
+_onName = None
+# args = None
+# dependence = {}
+# missing = {}
 # override Table.String to avoid difference of 'bytes' between versions of Python
 Table_String = Parser.Table.String
 def Table_String_new(tab,off):
@@ -99,6 +99,10 @@ def getImageOption(childKey, resourceData):
 		fileType = "Default"
 
 	text = '  <%s Type="%s" Path="%s" Plist="%s" />\n' %(childKey, fileType, path, plistFile)
+	
+	if _onRef:
+		return _onRef(csdPath,path if fileType=="Normal" else plistFile,(childKey, fileType, path, plistFile))
+
 	return text
 
 def getEasingText(easingData):
@@ -275,7 +279,10 @@ def getHeaderOption(optionData, optionKey, valuePath, defaultValue="", replaceIn
 		if result.upper() == str(defaultValue).upper():
 			return ""
 		result = result.replace("\n", "&#xA;")
-	
+
+	if _onName and optionKey=="Name":
+		return _onName(result)
+
 	renameDict = {}
 	if replaceInfo != "":
 		renameList = replaceInfo.split(",")
@@ -407,7 +414,7 @@ def recursionConvertTree(nodeTree, level = 0):
 		writeFile(baseTab + '</ObjectData>\n')
 
 def startConvert(csbPath, csparsebinary, targetPath):
-	global csdPath, targetOut
+	global csdPath
 	_, fileName = os.path.split(csbPath)
 	groupName,_ = os.path.splitext(fileName)
 	# csdPath = os.path.join(targetOut, groupName + ".csd")
@@ -426,7 +433,10 @@ def startConvert(csbPath, csparsebinary, targetPath):
 	recursionConvertTree(nodeTree)
 	writeFooter()
 
-def dealWithCsbFile(csbPath,targetPath):
+def dealWithCsbFile(csbPath,targetPath,onRef=None,onName = None):
+	global _onRef,_onName
+	_onRef = onRef
+	_onName = onName
 	with open(csbPath, "rb") as fileObj:
 		buf = fileObj.read()
 		fileObj.close()
@@ -436,32 +446,41 @@ def dealWithCsbFile(csbPath,targetPath):
 		startConvert(csbPath, csparsebinary, targetPath)
 	print("csd generated: %s"%targetPath)
 
-def main():
-	if len(sys.argv) != 3:
-		print("反编译csb文件")
-		print("usage:\tpython convert.py <infile> <outfile>")
-		print("\tpython convert.py <infolder> <outfolder>")
-		exit(0)
-	inpath = sys.argv[1]
-	outpath = sys.argv[2]
-	if(os.path.isdir(inpath)):
-		# treat input as a folder
-		for root,dirs,files in os.walk(inpath):
+# def main():
+# 	global args
 
-			for p in [os.path.join(root,f) for f in files]:
-				outfile = os.path.join(outpath,os.path.relpath(p,inpath))
-				outdir  = os.path.dirname(outfile)
-				if not os.path.exists(outdir):
-					os.makedirs(outdir)
-				if os.path.splitext(p)[1] in [".csb"]:
-					outfile = os.path.splitext(outfile)[0]+".csd"
-					dealWithCsbFile(p,outfile)
-				else:
-					copyfile(p,outfile)
-		print("translation completed! check your artifacts under %s"%os.path.realpath(outpath))
-	else:
-		# treat input as a single file
-		dealWithCsbFile(inpath,outpath)
 
-if __name__ == '__main__':
-    main()
+# 	if(os.path.isdir(args.input)):
+# 		# treat input as a folder
+# 		for root,dirs,files in os.walk(args.input):
+
+# 			for p in [os.path.join(root,f) for f in files]:
+# 				outfile = os.path.join(args.output,os.path.relpath(p,inpath))
+# 				outdir  = os.path.dirname(outfile)
+# 				if os.path.splitext(p)[1] in [".csb"]:
+# 					if not os.path.exists(outdir):
+# 						os.makedirs(outdir)
+# 					outfile = os.path.splitext(outfile)[0]+".csd"
+# 					dealWithCsbFile(p,outfile)
+# 					continue
+# 				if "-cp" in sys.argv:
+# 					if not os.path.exists(outdir):
+# 						os.makedirs(outdir)
+# 					copyfile(p,outfile)
+# 					continue
+# 		print("translation completed! check your artifacts under %s"%os.path.realpath(outpath))
+# 	else:
+# 		if not os.path.isdir(args.output):
+# 			print("err: outpath is not a dir")
+# 			return
+# 		# treat input as a single file
+# 		dealWithCsbFile(args.input,os.path.basename(os.path.splitext(args.output)[0])+".csd")
+# 	if args.dep:
+# 		with open(os.path.join(args.output,"dependence.json"),"w+") as f:
+# 			f.write(json.dumps(dependence,indent=4))
+# 	if args.mis:
+# 		with open(os.path.join(args.output,"missing.json"),"w+") as f:
+# 			f.write(json.dumps(missing,indent=4))
+
+# if __name__ == '__main__':
+#     main()
