@@ -1,6 +1,8 @@
 # csb2csd
 cocostudio csb反编成csd, forked from [lyzz0612/csb2csd](https://github.com/lyzz0612/csb2csd).
 
+建议使用dev分支，master用来pr。dev分支在多个真实项目上测试通过。
+
 ## 使用说明
 命令行输入：
 ```shell
@@ -53,4 +55,16 @@ optional arguments:
 
 `-n` 重命名有非法lua名称的节点，不使用此命令会导致“01”等名称的节点导出lua失败。
 
+## 例子
+导出测试用资源：
+```shell
+$ python cli.py test out #只生成csd文件
+```
+```shell
+$ # 只复制用到的素材，修复非法变量名，如果找不到素材，则到"path_to_cocostudio/images"
+$ # 和"path_to_cocostudio/images_another"中再次查找，用默认素材代替缺失素材。
+$ python cli.py --search-path "path_to_cocostudio/images" "path_to_cocostudio/images_another" \
+--copy ref --name-fix --refill cocos path_to_cocostudio path_to_output
+```
 
+你将在out目录下看到生成的设计文件
