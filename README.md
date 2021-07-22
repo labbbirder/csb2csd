@@ -4,9 +4,57 @@ cocostudio csb反编成csd
 建完工程搜了遍才发现已经有大佬实现了[csb2csd](https://github.com/DavidFeng/csb2csd)。可惜在windows系统折腾了几遍竟然没法编译成功(linux上一遍过了)。还是决定自己手撸一个好了。
 
 ## 使用说明
-1. 处理一个csb文件，运行`python convert.py <csb_file_in> <csd_file_out>`，执行后会生成对应的csd文件。
+命令行输入：
+```shell
+$ python cli.py -h
+```
+输出：
+```
+usage: cli.py [-h] [-d] [-m] [-r {keep,cocos,blank,drop}] [-c {all,ref,no}]
+              [-s SEARCH_PATH [SEARCH_PATH ...]] [-n]
+              input output
 
-2. 处理整个目录，运行`python convert.py <dir_in> <dir_out>`，执行后目录中的csb文件会反编译成csd文件，其他类型文件原封不动复制到新的路径下。
+反编译cocostudio的csb文件
+
+positional arguments:
+  input                 输入的csb文件或目录
+  output                输出目录
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d, --output-dependency
+                        output information of dependencies to dependence.json
+  -m, --output-missing-reference
+                        output information of missing references to
+                        missing.json
+  -r {keep,cocos,blank,drop}, --refill {keep,cocos,blank,drop}
+                        what to do with the missing references, especially the
+                        image file. 'keep' is to let it be, 'cocos' is to
+                        replace it with default resource of cocostudio,
+                        'blank' is to replace it with a transparent image.
+                        default is 'keep'.
+  -c {all,ref,no}, --copy {all,ref,no}
+                        which files in folder should be copied besides csd.
+                        'all' means whatever, 'ref' means only those
+                        referenced, 'no' means csd only. default is 'all'.
+  -s SEARCH_PATH [SEARCH_PATH ...], --search-path SEARCH_PATH [SEARCH_PATH ...]
+                        additional paths to search the missing references
+  -n, --name-fix        rename the nodes whose name is illegal in lua.
+```
+输入可以是单个文件，也可以是一个目录。输出需要指定一个目录。
+
+`-d` 表示输出资源依赖数据，可以用来分析资源依赖结构、自动划分图集等
+
+`-m` 表示输出缺失资源数据，方便后期补图。
+
+`-r` 如何处理缺失的资源。keep不处理，cocostudio导出时会报告资源丢失；cocos表示使用Default资源代替；blank使用一张透明图片代替原本位置；drop去掉缺图资源。默认是keep。
+
+`-c` 复制哪些资源。all表示输入目录内的所有资源；ref只复制csd中引用到的资源，可以减少资源数量；no表示只处理csb，不复制其他资源。默认是all。
+
+`-s` 找不到资源时，备用的搜索路径。适用于原工程设置了search_path的情况。
+
+`-n` 重命名有非法lua名称的节点，不使用此命令会导致“01”等名称的节点导出lua失败。
+
 
 如遇到转换过程报错或转换后格式错误的，欢迎反馈并尽量提供源文件。
 
@@ -20,21 +68,21 @@ cocostudio csb反编成csd
 ```
 配置
 "Button":[
-		["DisplayState", "Displaystate", false, ""],
-		["Scale9Enable", "Scale9Enabled", false, ""],
-		["LeftEage", "CapInsets.X", 0.0, ""],
-		["RightEage", "CapInsets.X", 0.0, ""],
-		["TopEage", "CapInsets.Y", 0.0, ""],
-		["BottomEage", "CapInsets.Y", 0.0, ""],
-		["Scale9OriginX", "CapInsets.X", 0.0, ""],
-		["Scale9OriginY", "CapInsets.Y", 0.0, ""],
-		["Scale9Width", "CapInsets.Width", 0.0, ""],
-		["Scale9Height", "CapInsets.Height", 0.0, ""],
-		["ShadowOffsetX", "ShadowOffsetX", 0.0, ""],
-		["ShadowOffsetY", "ShadowOffsetY", 0.0, ""],
-		["ButtonText", "Text", "", ""],
-		["FontSize", "FontSize", "", ""]
-	],
+    ["DisplayState", "Displaystate", false, ""],
+    ["Scale9Enable", "Scale9Enabled", false, ""],
+    ["LeftEage", "CapInsets.X", 0.0, ""],
+    ["RightEage", "CapInsets.X", 0.0, ""],
+    ["TopEage", "CapInsets.Y", 0.0, ""],
+    ["BottomEage", "CapInsets.Y", 0.0, ""],
+    ["Scale9OriginX", "CapInsets.X", 0.0, ""],
+    ["Scale9OriginY", "CapInsets.Y", 0.0, ""],
+    ["Scale9Width", "CapInsets.Width", 0.0, ""],
+    ["Scale9Height", "CapInsets.Height", 0.0, ""],
+    ["ShadowOffsetX", "ShadowOffsetX", 0.0, ""],
+    ["ShadowOffsetY", "ShadowOffsetY", 0.0, ""],
+    ["ButtonText", "Text", "", ""],
+    ["FontSize", "FontSize", "", ""]
+  ],
 ```
 ```
 对应csd结构
