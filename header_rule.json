@@ -19,7 +19,8 @@
         ["CallBackType", "CallBackType", "", ""],
         ["CallBackName", "CallBackName", "", ""],
         ["HorizontalEdge", "LayoutComponent.HorizontalEdge", "", ""],
-        ["VerticalEdge", "LayoutComponent.VerticalEdge", "", ""]
+        ["VerticalEdge", "LayoutComponent.VerticalEdge", "", ""],
+        ["Alpha","Alpha",255,""]
     ],
 
 	"Button":[
