@@ -4,6 +4,7 @@ import os
 import string
 import random
 import shutil
+import logging
 import json
 from shutil import copyfile
 
@@ -26,6 +27,7 @@ with open(os.path.join(script_path, "child_rule.json"), "r") as fileObj:
 csdPath = ""
 _onRef = None
 _onName = None
+_logger = None
 # args = None
 # dependence = {}
 # missing = {}
@@ -225,6 +227,7 @@ def writeRootNode(nodeTree):
 
 	widgetSize = widgetOption.Size()
 	widgetName = widgetOption.Name()
+
 	text = ''
 	nodeObject = {
 		"Node": "GameNodeObjectData",
@@ -233,7 +236,7 @@ def writeRootNode(nodeTree):
 		"Skeleton": "SkeletonNodeObjectData",
 	}
 	if not nodeObject.get(widgetName):
-		print("unknown widgetName:'%s', regarded as Node by default."%widgetName)
+		_logger.debug("unknown widgetName:'%s', regarded as Node by default."%widgetName)
 	text = text + '      <ObjectData Name="%s" ctype="%s">\n' %(widgetName, nodeObject.get(widgetName,"GameNodeObjectData"))
 	text = text + '        <Size X="%f" Y="%f" />\n' %(widgetSize.Width(), widgetSize.Height())
 	writeFile(text)
@@ -248,7 +251,7 @@ def getRealOption(className, optionData):
 	try:
 		optionClass = getattr(Parser, optionClassName)
 	except Exception as e:
-		print("error no match className: " + optionClassName)
+		_logger.warning("error no match className: " + optionClassName)
 		return 
 
 	if optionClass:
@@ -433,10 +436,11 @@ def startConvert(csbPath, csparsebinary, targetPath):
 	recursionConvertTree(nodeTree)
 	writeFooter()
 
-def dealWithCsbFile(csbPath,targetPath,onRef=None,onName = None):
-	global _onRef,_onName
+def dealWithCsbFile(csbPath,targetPath,onRef=None,onName = None,logger=None):
+	global _onRef,_onName,_logger
 	_onRef = onRef
 	_onName = onName
+	_logger = logger or logging
 	with open(csbPath, "rb") as fileObj:
 		buf = fileObj.read()
 		fileObj.close()
@@ -444,7 +448,7 @@ def dealWithCsbFile(csbPath,targetPath,onRef=None,onName = None):
 		buf = bytearray(buf)
 		csparsebinary = Parser.CSParseBinary.GetRootAsCSParseBinary(buf, 0)
 		startConvert(csbPath, csparsebinary, targetPath)
-	print("csd generated: %s"%targetPath)
+	_logger.info("csd generated: %s"%targetPath)
 
 # def main():
 # 	global args
