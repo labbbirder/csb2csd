@@ -50,7 +50,7 @@ except:
 def normalizeResult(result):
 
 	if isinstance(result,str_types):
-		return result
+		return result.replace("\n", "&#xA;").replace("\"","&quot;").replace("<","&lt;").replace(">","&gt;")
 	if isinstance(result,float):
 		result = "%f"%result
 		if "." in result:
@@ -281,7 +281,7 @@ def getHeaderOption(optionData, optionKey, valuePath, defaultValue="", replaceIn
 		# ignore if equals default value
 		if result.upper() == str(defaultValue).upper():
 			return ""
-		result = result.replace("\n", "&#xA;")
+
 
 	if _onName and optionKey=="Name":
 		return _onName(result)
