@@ -80,7 +80,7 @@
 		["ComboBoxIndex", "ColorType", 0, ""],
 		["BackColorAlpha", "BgColorOpacity", 255, ""],
 		["IsBounceEnabled", "BounceEnabled", false, ""],
-		["ScrollDirectionType", "Direction", 0, "0=Vertical,1=Horizontal,2=Vertical_Horizontal"],
+		["ScrollDirectionType", "Direction", 0, "0=None,1=Vertical,2=Horizontal,3=Vertical_Horizontal"],
 		["Scale9Enable", "BackGroundScale9Enabled", false, ""],
 		["LeftEage", "CapInsets.X", 0.0, ""],
 		["RightEage", "CapInsets.X", 0.0, ""],
@@ -135,7 +135,9 @@
 		["OutlineSize", "OutlineSize", "0", ""],
 		["ShadowEnabled", "ShadowEnabled", false, ""],
 		["ShadowOffsetX", "ShadowOffsetX", 0.0, ""],
-		["ShadowOffsetY", "ShadowOffsetY", 0.0, ""]
+		["ShadowOffsetY", "ShadowOffsetY", 0.0, ""],
+		["HorizontalAlignmentType","HAlignment",0,"0=HT_Left,1=HT_Center,2=HT_Right"],
+		["VerticalAlignmentType","VAlignment",0,"0=VT_Top,1=VT_Center,2=VT_Bottom"]
 	],
 	"TextAtlas":[
 		["CharWidth", "ItemWidth", "", ""],
