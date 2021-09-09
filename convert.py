@@ -87,13 +87,21 @@ def writeFooter():
 
 
 def getImageOption(childKey, resourceData):
-	fileType = "Default"
-	if resourceData.ResourceType() == 0:
-		fileType = "Normal"
-	elif resourceData.ResourceType() == 1:
-		fileType = "PlistSubImage"
-	path = resourceData.Path()
-	plistFile = resourceData.PlistFile()
+	fileType = "Normal"
+	path = ""
+	plistFile = ""
+	if hasattr(resourceData,"ResourceType"):
+
+		if resourceData.ResourceType() == 0:
+			fileType = "Normal"
+		elif resourceData.ResourceType() == 1:
+			fileType = "PlistSubImage"
+		path = resourceData.Path()
+		plistFile = resourceData.PlistFile()
+	else:
+		path = resourceData
+		plistFile = ""
+
 	if path == "" and plistFile == "":
 		return '  <%s />\n' %(childKey)
 

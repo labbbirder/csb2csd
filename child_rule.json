@@ -88,5 +88,8 @@
     "Particle":[
         ["FileData", "FileNameData", "", "ImageData"],
         ["BlendFunc", "BlendFunc", "", ""]
+    ],
+    "ProjectNode":[
+        ["FileData", "FileName", "", "ImageData"]
     ]
 }
